@@ -1,0 +1,7 @@
+{
+    "Réponse Merci": "Bonjour [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu.",
+    "Réponse Contrat": "Bonjour [NomClient],\n\nVeuillez trouver ci-joint le contrat demandé. Si vous avez des questions, n'hésitez pas à nous contacter.",
+    "Réponse Confirmation": "Bonjour [NomClient],\n\nJe vous confirme la réception de votre e-mail. Nous allons traiter votre demande dès que possible.",
+    "Réponse merci madame": "Bonjour Madame [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu.",
+    "Réponse merci docteur": "Bonjour Docteur [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu."
+}
