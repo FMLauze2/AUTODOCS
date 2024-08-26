@@ -1,11 +1,26 @@
 import tkinter as tk
 import json
 import os
+import sys
 
 # Chemin absolu pour les fichiers JSON et signature
 chemin_reponses = os.path.join(os.path.dirname(__file__), 'reponses.json')
 chemin_signature = os.path.join(os.path.dirname(__file__), 'signature.txt')
 
+def resource_path(relative_path):
+    """Obtenir le chemin absolu vers la ressource, fonctionne pour le développement et pour PyInstaller"""
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+def charger_reponses():
+    chemin_reponses = resource_path('reponses.json')
+    with open(chemin_reponses, 'r', encoding='utf-8') as f:
+        return json.load(f)
+    
 def charger_reponses():
     with open(chemin_reponses, 'r', encoding='utf-8') as f:
         return json.load(f)
