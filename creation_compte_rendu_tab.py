@@ -130,5 +130,4 @@ def create_creation_compte_rendu_tab(tab_creation_compte_rendu):
     btn_generer = tk.Button(scrollable_frame, text="Générer et Ouvrir Document Word", command=generer_document)
     btn_generer.pack(padx=10, pady=20)
 
-# Dans le fichier principal `main.py`, configurez la taille de la fenêtre principale
 

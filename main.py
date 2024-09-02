@@ -3,6 +3,7 @@ import sys, os, json
 from tkinter import ttk
 from utilisation_tab import create_utilisation_tab
 from creation_compte_rendu_tab import create_creation_compte_rendu_tab
+from creation_ticket_installation_tab import create_creation_ticket_installation_tab
 from options_tab import create_options_tab
 
 def main():
@@ -26,6 +27,11 @@ def main():
     tab_creation_compte_rendu = tk.Frame(notebook)
     create_creation_compte_rendu_tab(tab_creation_compte_rendu)
     notebook.add(tab_creation_compte_rendu, text="Création compte rendu")
+
+    # Nouvel onglet "Création ticket installation"
+    tab_creation_ticket_installation = tk.Frame(notebook)
+    create_creation_ticket_installation_tab(tab_creation_ticket_installation)
+    notebook.add(tab_creation_ticket_installation, text="Création ticket ASITEK")
 
     # Créer l'onglet "Options"
     tab_options = tk.Frame(notebook)
