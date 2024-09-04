@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
 from docx import Document
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 from docx2pdf import convert  # Pour générer le PDF directement à partir du fichier Word
 
@@ -69,21 +69,11 @@ def create_contrat_services_tab(tab_contrat_services):
     btn_ajouter_praticien = tk.Button(scrollable_frame, text="Ajouter Praticien", command=lambda: ajouter_praticien(listbox_praticiens))
     btn_ajouter_praticien.grid(row=7, column=1, padx=10, pady=5, sticky="w")
 
-    label_debut_contrat = tk.Label(scrollable_frame, text="Début du contrat :")
-    label_debut_contrat.grid(row=8, column=0, padx=10, pady=5, sticky="e")
-    entry_debut_contrat = tk.Entry(scrollable_frame, width=50)
-    entry_debut_contrat.grid(row=8, column=1, padx=10, pady=5, sticky="w")
-
-    label_fin_contrat = tk.Label(scrollable_frame, text="Fin du contrat :")
-    label_fin_contrat.grid(row=9, column=0, padx=10, pady=5, sticky="e")
-    entry_fin_contrat = tk.Entry(scrollable_frame, width=50)
-    entry_fin_contrat.grid(row=9, column=1, padx=10, pady=5, sticky="w")
-
-    label_date_realisation = tk.Label(scrollable_frame, text="Date de réalisation :")
-    label_date_realisation.grid(row=10, column=0, padx=10, pady=5, sticky="e")
+    label_date_realisation = tk.Label(scrollable_frame, text="Date de réalisation (début du contrat) :")
+    label_date_realisation.grid(row=8, column=0, padx=10, pady=5, sticky="e")
     entry_date_realisation = tk.Entry(scrollable_frame, width=50)
     entry_date_realisation.insert(0, datetime.now().strftime("%Y-%m-%d"))
-    entry_date_realisation.grid(row=10, column=1, padx=10, pady=5, sticky="w")
+    entry_date_realisation.grid(row=8, column=1, padx=10, pady=5, sticky="w")
 
     # Fonction pour ajouter un praticien
     def ajouter_praticien(listbox_praticiens):
@@ -99,6 +89,12 @@ def create_contrat_services_tab(tab_contrat_services):
                 if balise in run.text:
                     run.text = run.text.replace(balise, remplacement)
 
+    # Fonction pour calculer la date de fin du contrat (1 an après la date de réalisation)
+    def calculer_fin_contrat(date_realisation_str):
+        date_realisation = datetime.strptime(date_realisation_str, "%Y-%m-%d")
+        date_fin = date_realisation + timedelta(days=365)  # Ajouter 365 jours pour une année
+        return date_fin.strftime("%Y-%m-%d")
+
     # Fonction pour générer le contrat Word
     def generer_contrat():
         nom_cabinet = entry_nom_cabinet.get().strip()
@@ -108,13 +104,14 @@ def create_contrat_services_tab(tab_contrat_services):
         nombre_medecins = entry_nombre_medecins.get().strip()
         prix = entry_prix.get().strip()
         praticiens = listbox_praticiens.get(0, tk.END)
-        debut_contrat = entry_debut_contrat.get().strip()
-        fin_contrat = entry_fin_contrat.get().strip()
         date_realisation = entry_date_realisation.get().strip()
 
-        if not nom_cabinet or not nombre_medecins or not prix or not debut_contrat or not fin_contrat:
+        if not nom_cabinet or not nombre_medecins or not prix or not date_realisation:
             messagebox.showerror("Erreur", "Tous les champs sont obligatoires.")
             return
+
+        # Calculer la date de fin du contrat
+        date_fin = calculer_fin_contrat(date_realisation)
 
         # Vérifier si le fichier modèle existe
         if not os.path.exists(chemin_modele_contrat):
@@ -132,8 +129,8 @@ def create_contrat_services_tab(tab_contrat_services):
             "[VILLE_CABINET]": ville_cabinet,
             "[NOMBRE_MEDECINS]": nombre_medecins,
             "[PRIX]": prix,
-            "[DEBUT_CONTRAT]": debut_contrat,
-            "[FIN_CONTRAT]": fin_contrat,
+            "[DEBUT_CONTRAT]": date_realisation,
+            "[FIN_CONTRAT]": date_fin,
             "[DATE_REALISATION]": date_realisation,
             "[PRATICIENS]": ', '.join(praticiens)
         }
@@ -158,13 +155,14 @@ def create_contrat_services_tab(tab_contrat_services):
         nombre_medecins = entry_nombre_medecins.get().strip()
         prix = entry_prix.get().strip()
         praticiens = listbox_praticiens.get(0, tk.END)
-        debut_contrat = entry_debut_contrat.get().strip()
-        fin_contrat = entry_fin_contrat.get().strip()
         date_realisation = entry_date_realisation.get().strip()
 
-        if not nom_cabinet or not nombre_medecins or not prix or not debut_contrat or not fin_contrat:
+        if not nom_cabinet or not nombre_medecins or not prix or not date_realisation:
             messagebox.showerror("Erreur", "Tous les champs sont obligatoires.")
             return
+
+        # Calculer la date de fin du contrat
+        date_fin = calculer_fin_contrat(date_realisation)
 
         # Utiliser un modèle Word pour la conversion PDF
         doc = Document(chemin_modele_contrat)
@@ -177,8 +175,8 @@ def create_contrat_services_tab(tab_contrat_services):
             "[VILLE_CABINET]": ville_cabinet,
             "[NOMBRE_MEDECINS]": nombre_medecins,
             "[PRIX]": prix,
-            "[DEBUT_CONTRAT]": debut_contrat,
-            "[FIN_CONTRAT]": fin_contrat,
+            "[DEBUT_CONTRAT]": date_realisation,
+            "[FIN_CONTRAT]": date_fin,
             "[DATE_REALISATION]": date_realisation,
             "[PRATICIENS]": ', '.join(praticiens)
         }

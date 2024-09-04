@@ -13,7 +13,7 @@ def main():
     root.title("Gestionnaire de Réponses Email")
 
     # Définir la taille initiale de la fenêtre
-    root.geometry("1024x768")
+    root.geometry("1000x800")
 
     # Utiliser un Notebook pour les onglets
     notebook = ttk.Notebook(root)
@@ -22,7 +22,7 @@ def main():
     # Créer l'onglet "Utilisation"
     tab_main = tk.Frame(notebook)
     create_utilisation_tab(tab_main)
-    notebook.add(tab_main, text="Utilisation")
+    notebook.add(tab_main, text="Réponses Mail")
 
     # Créer l'onglet "Création compte rendu"
     tab_creation_compte_rendu = tk.Frame(notebook)
@@ -37,7 +37,7 @@ def main():
     # Créer l'onglet "Contrat de Services"
     tab_contrat_services = tk.Frame(notebook)
     create_contrat_services_tab(tab_contrat_services)
-    notebook.add(tab_contrat_services, text="Contrat de Services")
+    notebook.add(tab_contrat_services, text="Création contrat de Services")
 
     # Créer l'onglet "Options"
     tab_options = tk.Frame(notebook)
