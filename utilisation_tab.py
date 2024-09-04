@@ -2,6 +2,7 @@ import tkinter as tk
 import json
 import os
 import sys
+import pyperclip  # Pour copier dans le presse-papiers
 
 # Chemin absolu pour les fichiers JSON et signature
 chemin_reponses = os.path.join(os.path.dirname(__file__), 'reponses.json')
@@ -21,10 +22,6 @@ def charger_reponses():
     with open(chemin_reponses, 'r', encoding='utf-8') as f:
         return json.load(f)
     
-def charger_reponses():
-    with open(chemin_reponses, 'r', encoding='utf-8') as f:
-        return json.load(f)
-
 def create_utilisation_tab(tab_main):
     reponses = charger_reponses()
 
@@ -54,6 +51,11 @@ def create_utilisation_tab(tab_main):
         text_viewer.delete(1.0, tk.END)
         text_viewer.insert(tk.END, reponse)
 
+    def copier_texte_visionneuse():
+        texte = text_viewer.get("1.0", tk.END)
+        pyperclip.copy(texte)
+        tk.messagebox.showinfo("Succès", "Texte copié dans le presse-papiers.")
+
     def rafraichir_boutons():
         for widget in frame_buttons.winfo_children():
             widget.destroy()
@@ -65,7 +67,12 @@ def create_utilisation_tab(tab_main):
             button = tk.Button(frame_buttons, text=titre, width=20, command=lambda c=contenu: afficher_reponse(c))
             button.pack(pady=5)
 
+    # Bouton pour actualiser les réponses
     btn_actualiser = tk.Button(tab_main, text="Actualiser", command=rafraichir_boutons)
     btn_actualiser.grid(row=2, column=0, padx=5, pady=5, sticky="w")
+
+    # Bouton pour copier le texte de la visionneuse
+    btn_copier = tk.Button(tab_main, text="Copier", command=copier_texte_visionneuse)
+    btn_copier.grid(row=2, column=1, padx=5, pady=5, sticky="e")
 
     rafraichir_boutons()

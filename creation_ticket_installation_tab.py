@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 from docx import Document
 from docx.shared import Inches
 from datetime import datetime
@@ -31,47 +31,50 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
     # S'assurer que le canvas réagit à la molette de la souris
     scrollable_frame.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
 
-    # Utiliser grid pour disposer les éléments en deux colonnes
-    scrollable_frame.columnconfigure(0, weight=0)  # Colonne pour les labels
-    scrollable_frame.columnconfigure(1, weight=1)  # Colonne pour les inputs
-    scrollable_frame.columnconfigure(2, weight=1)  # Colonne pour la visionneuse
+    # Largeur uniforme pour tous les champs
+    field_width = 60  # Largeur des champs
+    large_text_height = 6  # Hauteur des Text widgets pour les sections comme Description et Actions
+
+    # Configuration des colonnes pour une meilleure gestion de l'espace
+    scrollable_frame.columnconfigure(0, weight=1)
+    scrollable_frame.columnconfigure(1, weight=3)
 
     # Widgets pour les inputs à gauche
     label_titre = tk.Label(scrollable_frame, text="Titre du ticket :")
     label_titre.grid(row=0, column=0, padx=10, pady=5, sticky="e")
-    entry_titre = tk.Entry(scrollable_frame, width=60)
+    entry_titre = tk.Entry(scrollable_frame, width=field_width)
     entry_titre.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 
     label_date = tk.Label(scrollable_frame, text="Date et heure :")
     label_date.grid(row=1, column=0, padx=10, pady=5, sticky="e")
-    entry_date = tk.Entry(scrollable_frame, width=60)
+    entry_date = tk.Entry(scrollable_frame, width=field_width)
     entry_date.insert(0, datetime.now().strftime("%Y-%m-%d %H:%M"))
     entry_date.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
     label_client = tk.Label(scrollable_frame, text="Client :")
     label_client.grid(row=2, column=0, padx=10, pady=5, sticky="e")
-    entry_client = tk.Entry(scrollable_frame, width=60)
+    entry_client = tk.Entry(scrollable_frame, width=field_width)
     entry_client.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
     # Champs supplémentaires
     label_version = tk.Label(scrollable_frame, text="Version installée :")
     label_version.grid(row=3, column=0, padx=10, pady=5, sticky="e")
-    entry_version = tk.Entry(scrollable_frame, width=60)
+    entry_version = tk.Entry(scrollable_frame, width=field_width)
     entry_version.grid(row=3, column=1, padx=10, pady=5, sticky="w")
 
     label_lecteurs = tk.Label(scrollable_frame, text="Type lecteurs installés :")
     label_lecteurs.grid(row=4, column=0, padx=10, pady=5, sticky="e")
-    entry_lecteurs = tk.Entry(scrollable_frame, width=60)
+    entry_lecteurs = tk.Entry(scrollable_frame, width=field_width)
     entry_lecteurs.grid(row=4, column=1, padx=10, pady=5, sticky="w")
 
     label_sauvegarde = tk.Label(scrollable_frame, text="Présence sauvegarde :")
     label_sauvegarde.grid(row=5, column=0, padx=10, pady=5, sticky="e")
-    entry_sauvegarde = tk.Entry(scrollable_frame, width=60)
+    entry_sauvegarde = tk.Entry(scrollable_frame, width=field_width)
     entry_sauvegarde.grid(row=5, column=1, padx=10, pady=5, sticky="w")
 
     label_postes = tk.Label(scrollable_frame, text="Nom des postes :")
     label_postes.grid(row=6, column=0, padx=10, pady=5, sticky="ne")
-    listbox_postes = tk.Listbox(scrollable_frame, height=4, width=57, selectmode=tk.SINGLE)
+    listbox_postes = tk.Listbox(scrollable_frame, height=4, width=field_width)
     listbox_postes.grid(row=6, column=1, padx=10, pady=5, sticky="w")
 
     btn_ajouter_poste = tk.Button(scrollable_frame, text="Ajouter Poste", command=lambda: ajouter_poste(listbox_postes))
@@ -79,23 +82,23 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
 
     label_poste_serveur = tk.Label(scrollable_frame, text="Poste serveur + type poste :")
     label_poste_serveur.grid(row=8, column=0, padx=10, pady=5, sticky="e")
-    entry_poste_serveur = tk.Entry(scrollable_frame, width=60)
+    entry_poste_serveur = tk.Entry(scrollable_frame, width=field_width)
     entry_poste_serveur.grid(row=8, column=1, padx=10, pady=5, sticky="w")
 
-    # Description et autres sections
+    # Description et autres sections avec hauteur ajustée
     label_description = tk.Label(scrollable_frame, text="Description de l'installation :")
     label_description.grid(row=9, column=0, padx=10, pady=5, sticky="ne")
-    text_description = tk.Text(scrollable_frame, wrap='word', height=4, width=57)
+    text_description = tk.Text(scrollable_frame, wrap='word', height=large_text_height, width=field_width)
     text_description.grid(row=9, column=1, padx=10, pady=5, sticky="w")
 
     label_actions = tk.Label(scrollable_frame, text="Actions à suivre :")
     label_actions.grid(row=10, column=0, padx=10, pady=5, sticky="ne")
-    text_actions = tk.Text(scrollable_frame, wrap='word', height=4, width=57)
+    text_actions = tk.Text(scrollable_frame, wrap='word', height=large_text_height, width=field_width)
     text_actions.grid(row=10, column=1, padx=10, pady=5, sticky="w")
 
     label_images = tk.Label(scrollable_frame, text="Images (Screenshots) :")
     label_images.grid(row=11, column=0, padx=10, pady=5, sticky="ne")
-    listbox_images = tk.Listbox(scrollable_frame, height=4, width=57, selectmode=tk.SINGLE)
+    listbox_images = tk.Listbox(scrollable_frame, height=4, width=field_width)
     listbox_images.grid(row=11, column=1, padx=10, pady=5, sticky="w")
 
     btn_ajouter_image = tk.Button(scrollable_frame, text="Ajouter Image", command=lambda: ajouter_image(listbox_images))
@@ -104,8 +107,11 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
     # Visionneuse à droite
     label_visionneuse = tk.Label(scrollable_frame, text="Aperçu du Ticket d'Installation :")
     label_visionneuse.grid(row=0, column=2, padx=10, pady=10, sticky="w")
-    text_visionneuse = tk.Text(scrollable_frame, wrap='word', height=40, width=50, state=tk.DISABLED)
+    text_visionneuse = tk.Text(scrollable_frame, wrap='word', height=40, width=50)
     text_visionneuse.grid(row=1, column=2, rowspan=12, padx=10, pady=5, sticky="nsew")
+
+    # Définir le tag pour le texte en gras dans la visionneuse
+    text_visionneuse.tag_configure("bold", font=("Helvetica", 10, "bold"))
 
     # Bouton pour copier le contenu de la visionneuse
     btn_copier = tk.Button(scrollable_frame, text="Copier", command=lambda: copier_texte_visionneuse(text_visionneuse))
@@ -125,14 +131,28 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
         description = text_description.get("1.0", tk.END).strip()
         actions = text_actions.get("1.0", tk.END).strip()
 
-        contenu = f"**Titre :** {titre}\n**Date et Heure :** {date_heure}\n**Client :** {client}\n"
-        contenu += f"**Version installée :** {version}\n**Type lecteurs installés :** {lecteurs}\n"
-        contenu += f"**Présence sauvegarde :** {sauvegarde}\n**Nom des postes :** {', '.join(postes)}\n"
-        contenu += f"**Poste serveur + type poste :** {poste_serveur}\n\n"
-        contenu += f"**Description :**\n{description}\n\n"
-        contenu += f"**Actions à suivre :**\n{actions}"
+        # Mise en forme des titres en gras à l'aide de tags
+        text_visionneuse.insert(tk.END, "Titre : ", "bold")
+        text_visionneuse.insert(tk.END, f"{titre}\n")
+        text_visionneuse.insert(tk.END, "Date et Heure : ", "bold")
+        text_visionneuse.insert(tk.END, f"{date_heure}\n")
+        text_visionneuse.insert(tk.END, "Client : ", "bold")
+        text_visionneuse.insert(tk.END, f"{client}\n")
+        text_visionneuse.insert(tk.END, "Version installée : ", "bold")
+        text_visionneuse.insert(tk.END, f"{version}\n")
+        text_visionneuse.insert(tk.END, "Type lecteurs installés : ", "bold")
+        text_visionneuse.insert(tk.END, f"{lecteurs}\n")
+        text_visionneuse.insert(tk.END, "Présence sauvegarde : ", "bold")
+        text_visionneuse.insert(tk.END, f"{sauvegarde}\n")
+        text_visionneuse.insert(tk.END, "Nom des postes : ", "bold")
+        text_visionneuse.insert(tk.END, f"{', '.join(postes)}\n")
+        text_visionneuse.insert(tk.END, "Poste serveur + type poste : ", "bold")
+        text_visionneuse.insert(tk.END, f"{poste_serveur}\n\n")
+        text_visionneuse.insert(tk.END, "Description :\n", "bold")
+        text_visionneuse.insert(tk.END, f"{description}\n\n")
+        text_visionneuse.insert(tk.END, "Actions à suivre :\n", "bold")
+        text_visionneuse.insert(tk.END, f"{actions}")
 
-        text_visionneuse.insert(tk.END, contenu)
         text_visionneuse.config(state=tk.DISABLED)
 
     # Lier les champs d'entrée à la fonction de mise à jour de la visionneuse
@@ -148,7 +168,7 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
     text_actions.bind("<KeyRelease>", mettre_a_jour_visionneuse)
 
     def ajouter_poste(listbox_postes):
-        poste = tk.simpledialog.askstring("Nom du Poste", "Entrez le nom du poste :")
+        poste = simpledialog.askstring("Nom du Poste", "Entrez le nom du poste :")
         if poste:
             listbox_postes.insert(tk.END, poste)
         mettre_a_jour_visionneuse()
@@ -212,3 +232,4 @@ def create_creation_ticket_installation_tab(tab_creation_ticket_installation):
 
     btn_generer = tk.Button(scrollable_frame, text="Générer et Ouvrir Document Word", command=generer_document)
     btn_generer.grid(row=14, column=0, columnspan=3, padx=10, pady=20)
+

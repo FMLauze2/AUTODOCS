@@ -2,6 +2,6 @@
     "Réponse Merci": "Bonjour [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu.",
     "Réponse Contrat": "Bonjour [NomClient],\n\nVeuillez trouver ci-joint le contrat demandé. Si vous avez des questions, n'hésitez pas à nous contacter.",
     "Réponse Confirmation": "Bonjour [NomClient],\n\nJe vous confirme la réception de votre e-mail. Nous allons traiter votre demande dès que possible.",
-    "Réponse merci madame": "Bonjour Madame [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu.",
+    "Demande coordonnées": "Bonjour docteur, \n\nJe vous contacte pour une prise de rendez-vous afin de traiter votre demande. \n\nAuriez vous un numéro direct auquel je peux vous joindre afin de convenir d'un rendez vous ? \n\nMerci d'avance, excellente journée",
     "Réponse merci docteur": "Bonjour Docteur [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu."
 }

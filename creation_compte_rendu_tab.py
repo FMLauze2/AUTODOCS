@@ -27,8 +27,22 @@ def create_creation_compte_rendu_tab(tab_creation_compte_rendu):
 
     canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
 
-    # S'assurer que le canvas réagit à la molette de la souris
-    scrollable_frame.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+    # Lier la barre de défilement au canvas
+    canvas.configure(yscrollcommand=scrollbar.set)
+
+    # Fonction pour le défilement avec la molette de la souris
+    def _bound_to_mousewheel(event):
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+    def _unbound_to_mousewheel(event):
+        canvas.unbind_all("<MouseWheel>")
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    # Lier le canvas et le scrollable_frame aux événements de la souris
+    canvas.bind("<Enter>", _bound_to_mousewheel)
+    canvas.bind("<Leave>", _unbound_to_mousewheel)
 
     # Ajouter les widgets dans scrollable_frame
     label_cr = tk.Label(scrollable_frame, text="Création de Compte Rendu")
@@ -129,5 +143,4 @@ def create_creation_compte_rendu_tab(tab_creation_compte_rendu):
 
     btn_generer = tk.Button(scrollable_frame, text="Générer et Ouvrir Document Word", command=generer_document)
     btn_generer.pack(padx=10, pady=20)
-
 
