@@ -3,6 +3,7 @@ from tkinter import filedialog, messagebox, simpledialog
 from docx import Document
 from datetime import datetime
 import os
+from docx2pdf import convert  # Pour générer le PDF directement à partir du fichier Word
 
 # Chemin vers le modèle de contrat
 chemin_modele_contrat = os.path.join(os.path.dirname(__file__), 'CONTRAT SERVICE.docx')
@@ -98,7 +99,7 @@ def create_contrat_services_tab(tab_contrat_services):
                 if balise in run.text:
                     run.text = run.text.replace(balise, remplacement)
 
-    # Fonction pour générer le contrat à partir du modèle Word
+    # Fonction pour générer le contrat Word
     def generer_contrat():
         nom_cabinet = entry_nom_cabinet.get().strip()
         adresse_cabinet = entry_adresse_cabinet.get().strip()
@@ -141,14 +142,66 @@ def create_contrat_services_tab(tab_contrat_services):
         for paragraphe in doc.paragraphs:
             remplacer_balises_dans_run(paragraphe, balises_remplacement)
 
-        # Sauvegarder le contrat généré
+        # Sauvegarder le fichier Word
         fichier_sortie = filedialog.asksaveasfilename(defaultextension=".docx", filetypes=[("Document Word", "*.docx")])
         if fichier_sortie:
             doc.save(fichier_sortie)
             messagebox.showinfo("Succès", "Le contrat de services a été généré avec succès.")
             os.startfile(fichier_sortie)
 
-    # Bouton pour générer le contrat
-    btn_generer_contrat = tk.Button(scrollable_frame, text="Générer et Ouvrir le Contrat", command=generer_contrat)
-    btn_generer_contrat.grid(row=11, column=1, padx=10, pady=20)
+    # Fonction pour générer directement un fichier PDF
+    def generer_pdf():
+        nom_cabinet = entry_nom_cabinet.get().strip()
+        adresse_cabinet = entry_adresse_cabinet.get().strip()
+        cp_cabinet = entry_cp_cabinet.get().strip()
+        ville_cabinet = entry_ville_cabinet.get().strip()
+        nombre_medecins = entry_nombre_medecins.get().strip()
+        prix = entry_prix.get().strip()
+        praticiens = listbox_praticiens.get(0, tk.END)
+        debut_contrat = entry_debut_contrat.get().strip()
+        fin_contrat = entry_fin_contrat.get().strip()
+        date_realisation = entry_date_realisation.get().strip()
 
+        if not nom_cabinet or not nombre_medecins or not prix or not debut_contrat or not fin_contrat:
+            messagebox.showerror("Erreur", "Tous les champs sont obligatoires.")
+            return
+
+        # Utiliser un modèle Word pour la conversion PDF
+        doc = Document(chemin_modele_contrat)
+
+        # Dictionnaire de balises et de valeurs de remplacement
+        balises_remplacement = {
+            "[NOM_CABINET]": nom_cabinet,
+            "[ADRESSE_CABINET]": adresse_cabinet,
+            "[CP_CABINET]": cp_cabinet,
+            "[VILLE_CABINET]": ville_cabinet,
+            "[NOMBRE_MEDECINS]": nombre_medecins,
+            "[PRIX]": prix,
+            "[DEBUT_CONTRAT]": debut_contrat,
+            "[FIN_CONTRAT]": fin_contrat,
+            "[DATE_REALISATION]": date_realisation,
+            "[PRATICIENS]": ', '.join(praticiens)
+        }
+
+        # Remplacer les balises dans chaque paragraphe tout en conservant la mise en forme
+        for paragraphe in doc.paragraphs:
+            remplacer_balises_dans_run(paragraphe, balises_remplacement)
+
+        # Sauvegarder le document Word avant conversion en PDF
+        fichier_sortie = filedialog.asksaveasfilename(defaultextension=".docx", filetypes=[("Document Word", "*.docx")])
+        if fichier_sortie:
+            doc.save(fichier_sortie)
+
+            # Convertir le fichier Word en PDF
+            fichier_pdf = fichier_sortie.replace('.docx', '.pdf')
+            convert(fichier_sortie, fichier_pdf)
+            messagebox.showinfo("Succès", "Le contrat de services a été généré en PDF.")
+            os.startfile(fichier_pdf)
+
+    # Bouton pour générer le contrat Word
+    btn_generer_contrat = tk.Button(scrollable_frame, text="Générer et Ouvrir le Contrat Word", command=generer_contrat)
+    btn_generer_contrat.grid(row=11, column=1, padx=10, pady=10)
+
+    # Bouton pour générer le contrat PDF
+    btn_generer_pdf = tk.Button(scrollable_frame, text="Générer et Ouvrir le Contrat PDF", command=generer_pdf)
+    btn_generer_pdf.grid(row=12, column=1, padx=10, pady=10)
