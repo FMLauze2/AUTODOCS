@@ -1,21 +1,10 @@
 import os
 import csv
 import tkinter as tk
-from tkinter import ttk, simpledialog, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox
 
 # Chemin vers le fichier CSV
 chemin_contrats_csv = os.path.join(os.path.dirname(__file__), 'contrats.csv')
-
-# Fonction pour ajouter un contrat dans le fichier CSV
-def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat):
-    fichier_existe = os.path.exists(chemin_contrats_csv)
-
-    with open(chemin_contrats_csv, mode='a', newline='', encoding='utf-8') as fichier_csv:
-        writer = csv.writer(fichier_csv)
-        if not fichier_existe:
-            writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier'])
-        type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
-        writer.writerow([nom_cabinet, date_realisation, fichier_contrat, type_fichier])
 
 # Fonction pour charger et afficher les contrats
 def charger_contrats(tree, filtre=""):
@@ -31,17 +20,49 @@ def charger_contrats(tree, filtre=""):
                 return  # Si le fichier est vide
 
             for row in reader:
-                # Si le fichier CSV contient 4 colonnes, on les utilise
                 if len(row) == 4:
                     nom_cabinet, date_realisation, fichier_contrat, type_fichier = row
-                # Si le fichier CSV contient seulement 3 colonnes, on ajoute le type de fichier par défaut
                 elif len(row) == 3:
                     nom_cabinet, date_realisation, fichier_contrat = row
                     type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
-                
-                # Filtrer selon la recherche
+
                 if filtre.lower() in nom_cabinet.lower():
                     tree.insert("", "end", values=(nom_cabinet, date_realisation, fichier_contrat, type_fichier))
+
+# Fonction pour supprimer un contrat du fichier CSV et de l'interface
+def supprimer_contrat(tree):
+    selected_item = tree.selection()
+    if not selected_item:
+        messagebox.showerror("Erreur", "Veuillez sélectionner un contrat à supprimer.")
+        return
+
+    # Obtenir les détails du contrat sélectionné
+    contrat_selectionne = tree.item(selected_item, 'values')
+    nom_cabinet, date_realisation, fichier_contrat, type_fichier = contrat_selectionne
+
+    confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment supprimer le contrat pour {nom_cabinet} ?")
+    if not confirmation:
+        return
+
+    # Lire tous les contrats dans une liste sauf celui à supprimer
+    contrats_restants = []
+    if os.path.exists(chemin_contrats_csv):
+        with open(chemin_contrats_csv, newline='', encoding='utf-8') as fichier_csv:
+            reader = csv.reader(fichier_csv)
+            en_tete = next(reader)  # Garder l'en-tête
+            for row in reader:
+                if row[0] != nom_cabinet or row[1] != date_realisation or row[2] != fichier_contrat:
+                    contrats_restants.append(row)
+
+    # Réécrire le fichier CSV sans le contrat supprimé
+    with open(chemin_contrats_csv, mode='w', newline='', encoding='utf-8') as fichier_csv:
+        writer = csv.writer(fichier_csv)
+        writer.writerow(en_tete)  # Réécrire l'en-tête
+        writer.writerows(contrats_restants)
+
+    # Supprimer l'entrée de la liste affichée
+    tree.delete(selected_item)
+    messagebox.showinfo("Succès", "Le contrat a été supprimé avec succès.")
 
 # Fonction pour ajouter un seul contrat
 def ajouter_un_contrat(tree):
@@ -96,6 +117,10 @@ def create_liste_contrats_tab(tab_liste_contrats):
     # Bouton pour ajouter un contrat
     btn_ajouter_contrat = tk.Button(tab_liste_contrats, text="Ajouter Contrat", command=lambda: ajouter_un_contrat(tree))
     btn_ajouter_contrat.pack(pady=10)
+
+    # Bouton pour supprimer un contrat sélectionné
+    btn_supprimer_contrat = tk.Button(tab_liste_contrats, text="Supprimer Contrat", command=lambda: supprimer_contrat(tree))
+    btn_supprimer_contrat.pack(pady=10)
 
     # Charger les contrats existants au démarrage
     charger_contrats(tree)
