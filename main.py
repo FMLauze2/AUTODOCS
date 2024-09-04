@@ -3,9 +3,9 @@ from tkinter import ttk
 from utilisation_tab import create_utilisation_tab
 from creation_compte_rendu_tab import create_creation_compte_rendu_tab
 from options_tab import create_options_tab
-from creation_ticket_installation_tab import create_creation_ticket_installation_tab  # Assurez-vous que le nom est correct
-
+from creation_ticket_installation_tab import create_creation_ticket_installation_tab
 from creation_contrat_services_tab import create_contrat_services_tab
+from liste_contrats_tab import create_liste_contrats_tab
 
 def main():
     # Créer l'interface graphique avec Tkinter
@@ -38,6 +38,11 @@ def main():
     tab_contrat_services = tk.Frame(notebook)
     create_contrat_services_tab(tab_contrat_services)
     notebook.add(tab_contrat_services, text="Création contrat de Services")
+
+    # Créer un nouvel onglet "Liste des contrats"
+    tab_liste_contrats = tk.Frame(notebook)
+    create_liste_contrats_tab(tab_liste_contrats)
+    notebook.add(tab_liste_contrats, text="Liste des contrats")
 
     # Créer l'onglet "Options"
     tab_options = tk.Frame(notebook)
