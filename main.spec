@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('reponses.json', '.'), ('signature.txt', '.')],
+    datas=[('reponses.json', '.'), ('signature.txt', '.'), ('COMPTE RENDU.docx', '.'), ('CONTRAT SERVICE.docx', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
