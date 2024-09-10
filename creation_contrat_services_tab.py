@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
 from docx import Document
 from datetime import datetime, timedelta
+from docx2pdf import convert
 
 # Chemin vers le modèle de contrat
 chemin_modele_contrat = os.path.join(os.path.dirname(__file__), 'CONTRAT SERVICE.docx')
@@ -12,26 +13,21 @@ chemin_modele_contrat = os.path.join(os.path.dirname(__file__), 'CONTRAT SERVICE
 chemin_contrats_csv = os.path.join(os.path.dirname(__file__), 'contrats.csv')
 
 # Fonction pour ajouter un contrat dans le fichier CSV
-def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat):
+def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat, date_envoi="", date_reception=""):
     fichier_existe = os.path.exists(chemin_contrats_csv)
 
-    with open(chemin_contrats_csv, mode='a', newline='', encoding='utf-8') as fichier_csv:
-        writer = csv.writer(fichier_csv)
-        if not fichier_existe:
-            writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier'])
-        type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
-        writer.writerow([nom_cabinet, date_realisation, fichier_contrat, type_fichier])
+    try:
+        with open(chemin_contrats_csv, mode='a', newline='', encoding='utf-8') as fichier_csv:
+            writer = csv.writer(fichier_csv)
+            if not fichier_existe:
+                writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier', 'Date d\'envoi', 'Date de réception'])
+            type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
+            writer.writerow([nom_cabinet, date_realisation, fichier_contrat, type_fichier, date_envoi, date_reception])
+    except Exception as e:
+        print(f"Erreur lors de l'ajout du contrat dans le CSV : {e}")
 
-# Fonction pour remplacer les balises tout en conservant la mise en forme
-def remplacer_balises_dans_run(paragraph, balises_remplacement):
-    """Remplacer les balises dans les runs d'un paragraphe sans modifier la mise en forme."""
-    for run in paragraph.runs:
-        for balise, remplacement in balises_remplacement.items():
-            if balise in run.text:
-                run.text = run.text.replace(balise, remplacement)
-
-# Fonction pour générer le contrat à partir du modèle Word
-def generer_contrat():
+# Fonction pour générer le contrat en PDF
+def generer_contrat_pdf():
     nom_cabinet = entry_nom_cabinet.get().strip()
     adresse_cabinet = entry_adresse_cabinet.get().strip()
     cp_cabinet = entry_cp_cabinet.get().strip()
@@ -54,11 +50,6 @@ def generer_contrat():
         messagebox.showerror("Erreur", "La date de réalisation doit être au format YYYY-MM-DD.")
         return
 
-    # Vérifier si le fichier modèle existe
-    if not os.path.exists(chemin_modele_contrat):
-        messagebox.showerror("Erreur", f"Le fichier {chemin_modele_contrat} est introuvable.")
-        return
-
     # Charger le modèle Word
     doc = Document(chemin_modele_contrat)
 
@@ -76,20 +67,26 @@ def generer_contrat():
         "[PRATICIENS]": ', '.join(praticiens)
     }
 
-    # Remplacer les balises dans chaque paragraphe tout en conservant la mise en forme
+    # Remplacer les balises dans chaque paragraphe
     for paragraphe in doc.paragraphs:
-        remplacer_balises_dans_run(paragraphe, balises_remplacement)
+        for balise, remplacement in balises_remplacement.items():
+            if balise in paragraphe.text:
+                paragraphe.text = paragraphe.text.replace(balise, remplacement)
 
-    # Sauvegarder le contrat généré
+    # Sauvegarder le contrat en Word
     fichier_sortie = filedialog.asksaveasfilename(defaultextension=".docx", filetypes=[("Document Word", "*.docx")])
     if fichier_sortie:
         doc.save(fichier_sortie)
-        
-        # Ajouter le contrat dans le CSV
-        ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_sortie)
 
-        messagebox.showinfo("Succès", "Le contrat de services a été généré et ajouté à la liste.")
-        os.startfile(fichier_sortie)
+        # Convertir en PDF avec docx2pdf
+        fichier_pdf = fichier_sortie.replace('.docx', '.pdf')
+        convert(fichier_sortie, fichier_pdf)
+
+        # Ajouter le contrat dans le CSV
+        ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_pdf)
+
+        messagebox.showinfo("Succès", "Le contrat de services a été généré en PDF et ajouté à la liste.")
+        os.startfile(fichier_pdf)
 
 # Fonction pour créer le formulaire de génération de contrat dans l'onglet
 def create_contrat_services_tab(tab_contrat_services):
@@ -164,9 +161,25 @@ def create_contrat_services_tab(tab_contrat_services):
     entry_date_realisation.insert(0, datetime.now().strftime("%Y-%m-%d"))
     entry_date_realisation.grid(row=8, column=1, padx=10, pady=5, sticky="w")
 
-    # Bouton pour générer le contrat
-    btn_generer_contrat = tk.Button(scrollable_frame, text="Générer et Ouvrir le Contrat", command=generer_contrat)
-    btn_generer_contrat.grid(row=9, column=1, padx=10, pady=20)
+    # Bouton pour générer le contrat en PDF
+    btn_generer_pdf = tk.Button(scrollable_frame, text="Générer le PDF", command=generer_contrat_pdf)
+    btn_generer_pdf.grid(row=9, column=1, padx=10, pady=20)
+
+    # Bouton pour rafraîchir le formulaire
+    btn_rafraichir_formulaire = tk.Button(scrollable_frame, text="Rafraîchir le formulaire", command=rafraichir_formulaire)
+    btn_rafraichir_formulaire.grid(row=10, column=1, padx=10, pady=10)
+
+# Fonction pour rafraîchir le formulaire après la génération du contrat
+def rafraichir_formulaire():
+    entry_nom_cabinet.delete(0, tk.END)
+    entry_adresse_cabinet.delete(0, tk.END)
+    entry_cp_cabinet.delete(0, tk.END)
+    entry_ville_cabinet.delete(0, tk.END)
+    entry_nombre_medecins.delete(0, tk.END)
+    entry_prix.delete(0, tk.END)
+    listbox_praticiens.delete(0, tk.END)
+    entry_date_realisation.delete(0, tk.END)
+    entry_date_realisation.insert(0, datetime.now().strftime("%Y-%m-%d"))
 
 # Fonction pour ajouter un praticien à la liste
 def ajouter_praticien(listbox_praticiens):
