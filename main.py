@@ -6,6 +6,7 @@ from options_tab import create_options_tab
 from creation_ticket_installation_tab import create_creation_ticket_installation_tab
 from creation_contrat_services_tab import create_contrat_services_tab
 from liste_contrats_tab import create_liste_contrats_tab
+from creation_fiche_prospect import create_fichier_prospect_tab  # Import de l'onglet
 import os
 import sys
 
@@ -56,6 +57,11 @@ def main():
     tab_liste_contrats = tk.Frame(notebook)
     create_liste_contrats_tab(tab_liste_contrats)
     notebook.add(tab_liste_contrats, text="Liste des contrats")
+
+    # Créer l'onglet "Création fichier prospect"
+    tab_fichier_prospect = tk.Frame(notebook)
+    create_fichier_prospect_tab(tab_fichier_prospect)
+    notebook.add(tab_fichier_prospect, text="Création fichier prospect")  # Ajouter l'onglet
 
     # Créer l'onglet "Options"
     tab_options = tk.Frame(notebook)
