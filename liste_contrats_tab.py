@@ -1,7 +1,7 @@
 import os
 import csv
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, simpledialog  # Ajout de simpledialog
 
 # Chemin vers le fichier CSV
 chemin_contrats_csv = os.path.join(os.path.dirname(__file__), 'contrats.csv')
@@ -28,6 +28,17 @@ def charger_contrats(tree, filtre=""):
 
                 if filtre.lower() in nom_cabinet.lower():
                     tree.insert("", "end", values=(nom_cabinet, date_realisation, fichier_contrat, type_fichier))
+
+# Fonction pour ajouter un contrat dans le fichier CSV
+def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat):
+    fichier_existe = os.path.exists(chemin_contrats_csv)
+
+    with open(chemin_contrats_csv, mode='a', newline='', encoding='utf-8') as fichier_csv:
+        writer = csv.writer(fichier_csv)
+        if not fichier_existe:
+            writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier'])
+        type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
+        writer.writerow([nom_cabinet, date_realisation, fichier_contrat, type_fichier])
 
 # Fonction pour supprimer un contrat du fichier CSV et de l'interface
 def supprimer_contrat(tree):
@@ -121,6 +132,10 @@ def create_liste_contrats_tab(tab_liste_contrats):
     # Bouton pour supprimer un contrat sélectionné
     btn_supprimer_contrat = tk.Button(tab_liste_contrats, text="Supprimer Contrat", command=lambda: supprimer_contrat(tree))
     btn_supprimer_contrat.pack(pady=10)
+
+    # Bouton pour rafraîchir la liste des contrats
+    btn_rafraichir = tk.Button(tab_liste_contrats, text="Rafraîchir la liste", command=lambda: charger_contrats(tree))
+    btn_rafraichir.pack(pady=10)
 
     # Charger les contrats existants au démarrage
     charger_contrats(tree)

@@ -6,6 +6,19 @@ from options_tab import create_options_tab
 from creation_ticket_installation_tab import create_creation_ticket_installation_tab
 from creation_contrat_services_tab import create_contrat_services_tab
 from liste_contrats_tab import create_liste_contrats_tab
+import os
+import sys
+
+# Fonction pour obtenir le chemin des ressources empaquetées avec PyInstaller
+def resource_path(relative_path):
+    """Obtenir le chemin absolu vers la ressource, fonctionne pour PyInstaller."""
+    try:
+        # PyInstaller crée un répertoire temporaire pour stocker les fichiers
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, relative_path)
 
 def main():
     # Créer l'interface graphique avec Tkinter
