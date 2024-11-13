@@ -23,8 +23,10 @@ def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat, dat
                 writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier', 'Date d\'envoi', 'Date de réception'])
             type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
             writer.writerow([nom_cabinet, date_realisation, fichier_contrat, type_fichier, date_envoi, date_reception])
+        print(f"Contrat ajouté dans le CSV : {nom_cabinet}, {fichier_contrat}")
     except Exception as e:
         print(f"Erreur lors de l'ajout du contrat dans le CSV : {e}")
+        messagebox.showerror("Erreur CSV", "L'ajout du contrat dans le fichier CSV a échoué.")
 
 # Fonction pour générer le contrat en PDF
 def generer_contrat_pdf():
@@ -76,17 +78,22 @@ def generer_contrat_pdf():
     # Sauvegarder le contrat en Word
     fichier_sortie = filedialog.asksaveasfilename(defaultextension=".docx", filetypes=[("Document Word", "*.docx")])
     if fichier_sortie:
-        doc.save(fichier_sortie)
-
-        # Convertir en PDF avec docx2pdf
-        fichier_pdf = fichier_sortie.replace('.docx', '.pdf')
-        convert(fichier_sortie, fichier_pdf)
-
-        # Ajouter le contrat dans le CSV
-        ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_pdf)
-
-        messagebox.showinfo("Succès", "Le contrat de services a été généré en PDF et ajouté à la liste.")
-        os.startfile(fichier_pdf)
+        try:
+            doc.save(fichier_sortie)
+            # Convertir en PDF avec docx2pdf
+            fichier_pdf = fichier_sortie.replace('.docx', '.pdf')
+            convert(fichier_sortie, fichier_pdf)
+            
+            # Vérifier si le fichier PDF a bien été créé
+            if os.path.exists(fichier_pdf):
+                ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_pdf)
+                messagebox.showinfo("Succès", "Le contrat de services a été généré en PDF et ajouté à la liste.")
+                os.startfile(fichier_pdf)
+            else:
+                raise FileNotFoundError("Le fichier PDF n'a pas été créé.")
+        except Exception as e:
+            print(f"Erreur lors de la génération du PDF : {e}")
+            messagebox.showerror("Erreur PDF", "La conversion en PDF a échoué.")
 
 # Fonction pour créer le formulaire de génération de contrat dans l'onglet
 def create_contrat_services_tab(tab_contrat_services):

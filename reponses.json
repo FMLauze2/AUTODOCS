@@ -1,7 +1,7 @@
 {
-    "Réponse Merci": "Bonjour [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu.",
     "Réponse Contrat": "Bonjour [NomClient],\n\nVeuillez trouver ci-joint le contrat demandé. Si vous avez des questions, n'hésitez pas à nous contacter.",
     "Réponse Confirmation": "Bonjour [NomClient],\n\nJe vous confirme la réception de votre e-mail. Nous allons traiter votre demande dès que possible.",
-    "Demande coordonnées": "Bonjour docteur, \n\nJe vous contacte pour une prise de rendez-vous afin de traiter votre demande. \n\nAuriez vous un numéro direct auquel je peux vous joindre afin de convenir d'un rendez vous ? \n\nMerci d'avance, excellente journée",
-    "Réponse merci docteur": "Bonjour Docteur [NomClient],\n\nMerci beaucoup pour votre e-mail. Je vous répondrai sous peu."
+    "Demande coordonnées": "Bonjour docteur, auriez vous une ligne téléphonique directe à laquelle je peux vous joindre afin de planifier l'opération ?\n\nMerci d'avance,\n\nExcellente journée",
+    "Demande retour contrat services": "Bonjour,\n\nVeuillez trouver ci-joint le contrat de services Médoc à me retourner signé.\n\nMerci d'avance, bonne journée.\n\nCordialement",
+    "Réponse infos antivirus": "Bonjour, \n\nLes chemins à autoriser sur l'antivirus sont :\n\n- C:\\Medoc\n- C:\\Programmes\\santesocial\n- C:\\Programmes x86\\santesocial\n- C:\\ProgramData\\santesocial\n\nServeur : \n\n\\\\SERVEUR\\MEDOC Installations\n\\\\SERVEUR\\CRIP Informatique"
 }

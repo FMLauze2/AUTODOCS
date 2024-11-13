@@ -20,6 +20,7 @@ def charger_contrats(tree, filtre=""):
                 return  # Si le fichier est vide
 
             for row in reader:
+                # Assurer que chaque ligne ait bien 6 colonnes
                 while len(row) < 6:
                     row.append("")  # Ajouter des colonnes vides pour les lignes incomplètes
 
@@ -37,7 +38,7 @@ def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat, dat
     if fichier_existe:
         with open(chemin_contrats_csv, newline='', encoding='utf-8') as fichier_csv:
             reader = csv.reader(fichier_csv)
-            en_tete = next(reader)
+            en_tete = next(reader, None)  # Récupérer l'en-tête si elle existe
             contrats = list(reader)
 
     # Vérifier si le contrat existe déjà
@@ -55,12 +56,16 @@ def ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat, dat
         type_fichier = "PDF" if fichier_contrat.endswith(".pdf") else "Word"
         contrats.append([nom_cabinet, date_realisation, fichier_contrat, type_fichier, date_envoi, date_reception])
 
-    with open(chemin_contrats_csv, mode='w', newline='', encoding='utf-8') as fichier_csv:
-        writer = csv.writer(fichier_csv)
-        writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier', 'Date d\'envoi', 'Date de réception'])
-        writer.writerows(contrats)
+    # Écriture dans le fichier CSV
+    try:
+        with open(chemin_contrats_csv, mode='w', newline='', encoding='utf-8') as fichier_csv:
+            writer = csv.writer(fichier_csv)
+            writer.writerow(['Nom du Cabinet', 'Date de Réalisation', 'Chemin du Fichier', 'Type Fichier', 'Date d\'envoi', 'Date de réception'])
+            writer.writerows(contrats)
+    except Exception as e:
+        messagebox.showerror("Erreur", f"Erreur lors de la mise à jour du CSV : {e}")
 
-# Fonction pour ajouter un contrat (correctement définie)
+# Fonction pour ajouter un contrat
 def ajouter_un_contrat(tree):
     fichier_contrat = filedialog.askopenfilename(
         title="Sélectionnez un contrat historique (Word ou PDF)",
@@ -76,7 +81,6 @@ def ajouter_un_contrat(tree):
             return
 
         ajouter_contrat_dans_csv(nom_cabinet, date_realisation, fichier_contrat)
-
         charger_contrats(tree)
         messagebox.showinfo("Succès", "Le contrat a été ajouté avec succès.")
 
@@ -103,6 +107,42 @@ def ajouter_date(tree, type_date):
 
     charger_contrats(tree)
     messagebox.showinfo("Succès", f"La date de {type_date} a été mise à jour pour {nom_cabinet}.")
+
+# Fonction pour supprimer un contrat du fichier CSV et de l'interface
+def supprimer_contrat(tree):
+    selected_item = tree.selection()
+    if not selected_item:
+        messagebox.showerror("Erreur", "Veuillez sélectionner un contrat à supprimer.")
+        return
+
+    # Obtenir les détails du contrat sélectionné
+    contrat_selectionne = tree.item(selected_item, 'values')
+    nom_cabinet, date_realisation, fichier_contrat, type_fichier, date_envoi, date_reception = contrat_selectionne
+
+    confirmation = messagebox.askyesno("Confirmation", f"Voulez-vous vraiment supprimer le contrat pour {nom_cabinet} ?")
+    if not confirmation:
+        return
+
+    # Lire tous les contrats dans une liste sauf celui à supprimer
+    contrats_restants = []
+    if os.path.exists(chemin_contrats_csv):
+        with open(chemin_contrats_csv, newline='', encoding='utf-8') as fichier_csv:
+            reader = csv.reader(fichier_csv)
+            en_tete = next(reader)  # Garder l'en-tête
+            for row in reader:
+                # Comparer les détails pour s'assurer que c'est bien le contrat à supprimer
+                if row[0] != nom_cabinet or row[1] != date_realisation or row[2] != fichier_contrat:
+                    contrats_restants.append(row)
+
+    # Réécrire le fichier CSV sans le contrat supprimé
+    with open(chemin_contrats_csv, mode='w', newline='', encoding='utf-8') as fichier_csv:
+        writer = csv.writer(fichier_csv)
+        writer.writerow(en_tete)  # Réécrire l'en-tête
+        writer.writerows(contrats_restants)
+
+    # Supprimer l'entrée de la liste affichée
+    tree.delete(selected_item)
+    messagebox.showinfo("Succès", "Le contrat a été supprimé avec succès.")
 
 # Fonction pour créer l'onglet des contrats
 def create_liste_contrats_tab(tab_liste_contrats):
